@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Migrating Tryton modules to Python3</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/night.css">
+		<link rel="stylesheet" href="css/custom.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+                    <h1>Migrating Tryton modules to <span class="enfassis">Python3</span></h1>
+                    <p>Available on: <a target="_blank"
+                        href="http://pokoli.github.io/migrating-to-python3/">
+                        http://pokoli.github.io/migrating-to-python3/</a></p>
+                </section>
+				<section>
+                    <h2> Who am I?</h2>
+                    <h3 class="fragment enfassis">
+                        Sergi Almacellas Abellana</h3>
+                    <ul>
+                        <li class="fragment">(Python &hearts;) Programmer</li>
+                        <li class="fragment">Open source enthusiast</li>
+                        <li class="fragment">Tryton commiter since Nov 2013
+                        </li>
+                    </ul>
+                </section>
+				<section>
+                    <h2>Why should I migrate?</h2>
+                    <ul>
+                        <li class="fragment">Python 2.7 EOL: 1st January 2020</li>
+                        <li class="fragment">There is no Python 2.8</li>
+                        <li class="fragment">Tryton 5.0 will not support Python 2</li>
+                        <li class="fragment">5.0: scheduled on 1st October 2018</li>
+                        <li class="fragment">Tryton docker image runs on Python3</li>
+                    </ul>
+                </section>
+				<section>
+                    <h2>Why should I migrate?</h2>
+                    <img class="fragment" src="img/if-not-now-when.jpg"/>
+                </section>
+				<section>
+                    <h2>Questions you should ask:</h2>
+                    <ul>
+                        <li class="fragment">Do I have proper test coverage?</li>
+                        <li class="fragment">Are my dependencies ported to python3?</li>
+                        <li class="fragment">Am I aware of py3 breaking changes?</li>
+                        <li class="fragment">Do I want to support both python versions?</li>
+                    </ul>
+                </section>
+				<section>
+                    <h2>Which Python 3 version should I target?</h2>
+                    <ul>
+                        <li class="fragment">Python 3.7 is expected for Summer 2018</li>
+                        <li class="fragment">Python 3.3 is in EOL</li>
+                        <li class="fragment">Python 3.5 is used on Debian Stable</li>
+                    </ul>
+                </section>
+				<section>
+                    <h2>Bytes vs. Strings</h2>
+                    <p class="fragment">Python 2:
+                    <pre class="fragment"><code>
+>>> '' + b''
+''
+                    </code></pre></p>
+                    <p class="fragment">Python 3:
+                    <pre class="fragment"><code>
+>>> '' + b''
+Traceback (most recent call last):
+TypeError: can't concat bytes to str
+                    </code></pre></p>
+                </section>
+				<section>
+                    <h2>Floor division</h2>
+                    <p class="fragment">Python 2:
+                    <pre class="fragment"><code>
+>>> 4 / 3
+1
+>>> 4 / 3.0
+1.3333333333333333
+                    </code></pre></p>
+                    <p class="fragment">Python 3:
+                    <pre class="fragment"><code>
+>>> 4 / 3
+1.3333333333333333
+>>> 4 / 3.0
+1.3333333333333333
+                    </code></pre></p>
+                    <p class="fragment">Both Versions:
+                    <pre class="fragment"><code>
+>>> 4 // 3
+1
+                    </code></pre></p>
+                </section>
+				<section>
+                    <h2>Other notable changes</h2>
+                    <ul>
+                        <li class="fragment">print is a function</li>
+                        <li class="fragment">Iterators instead of lists</li>
+                        <li class="fragment">Long renamed to int</li>
+                        <li class="fragment">New metaclass syntax</li>
+                        <li class="fragment">unorderable types: NoneType() < int()</li>
+                        <li class="fragment">Libraries renamed: ConfigParser vs configparser</li>
+                    </ul>
+                </section>
+				<section>
+                    <h2>Full changes list:</h2>
+                    <a href="https://docs.python.org/3.0/whatsnew/3.0.html">
+                        https://docs.python.org/3.0/whatsnew/3.0.html</a>
+                </section>
+				<section>
+                    <h2>Python3 compatible libraries:</h2>
+                    <span class="fragment">
+                    <a href="https://caniusepython3.com/">
+                        https://caniusepython3.com/</a>
+                    <a href="http://py3readiness.org/">
+                        http://py3readiness.org/</a>
+                    </span>
+                </section>
+				<section>
+                    <h2>Tools: 2to3</h2>
+                    <ul>
+                        <li class="fragment">Automated code translation</li>
+                        <li class="fragment">Script in the python interpreter</li>
+                        <li class="fragment">Provides a diff by default</li>
+                        <li class="fragment">Can modify files in place: 2to3 -w .</li>
+                        <li class="fragment">Generates a backup file</li>
+                        <li class="fragment">Can be used on setup.py</li>
+                    </ul>
+                </section>
+				<section>
+                    <h2>Tools: -3 command line switch</h2>
+                    <ul>
+                        <li class="fragment">Warns about features remove in 3.0</li>
+                        <li class="fragment">Can be used to run a test suite</li>
+                    </ul>
+                    <pre class="fragment"><code>
+python -3 -m trytond.tests.run-tests -m <your_module>
+                    </code></pre></p>
+                </section>
+				<section>
+                    <h2>Tools: tox</h2>
+                    <ul>
+                        <li class="fragment">Checks your package install on different Python versions</li>
+                        <li class="fragment">Runs your test on each environment</li>
+                    </ul>
+                    <pre class="fragment"><code>
+tox -e py{27,34,35,36}-sqlite --skip-missing-interpreters
+                    </code></pre></p>
+                </section>
+				<section>
+                    <h2>My advice:</h2>
+                    <ul>
+                        <li class="fragment">Don't be afraid of python3</li>
+                        <li class="fragment">Some modules run without changes on Python 3</li>
+                        <li class="fragment">Add tests for major breaking changes</li>
+                        <li class="fragment">Add CI for testing python3</li>
+                        <li class="fragment">Start running Python3 on production</li>
+                        <li class="fragment">Test and fix issues</li>
+                    </ul>
+                </section>
+				<section>
+                    <p><img src="img/i-can-help.jpg"></p>
+                    <ul>
+                        <li><a target="_blank"
+                            href="mailto:sergi@koopli.com">
+                            sergi (at) koopli (dot) com
+                        <li><a target="_blank"
+                            href="https://www.twitter.com/pokoli_srk">
+                            @pokoli_srk on twitter
+                        </a></li>
+                        <li>pokoli IRC Channel</li>
+                        <li>Let's talk on about it here!</li>
+                    </ul>
+                </section>
+				<section>
+                    <h1>Thank you!</h1>
+                    <p>The presentation code is available on:</p>
+                    <p><a target="_blank"
+                        href="http://github.com/pokoli/migrating-to-python3/">
+                        http://github.com/pokoli/migrating-to-python3/
+                    </a></p>
+                    <h1 class="fragment">Questions?</h1>
+                </section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
